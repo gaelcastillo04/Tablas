@@ -1,23 +1,8 @@
 import React, { useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Box,
-  Typography,
-  Button,
-  Collapse,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem
+  Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, Paper, Box, Typography, Button, Collapse, IconButton,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -36,10 +21,10 @@ const HeaderCell = styled(TableCell)(({ theme }) => ({
 
 const DarkTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: '#1e1e1e'
+    backgroundColor: '#1e1e1e',
   },
   '&:hover': {
-    backgroundColor: '#333'
+    backgroundColor: '#333',
   }
 }));
 
@@ -49,7 +34,14 @@ export default function OrdersTable() {
 
   const schema = new OrderFormSchema(false);
   const validate = (values) => {
-    const { error } = schema.getSchema().validate(values, { abortEarly: false });
+    const adjusted = {
+      ...values,
+      products: typeof values.products === 'string'
+        ? values.products.split(',').map((p) => p.trim()).filter(Boolean)
+        : values.products
+    };
+
+    const { error } = schema.getSchema().validate(adjusted, { abortEarly: false });
     const errors = {};
     if (error) {
       error.details.forEach((detail) => {
@@ -87,7 +79,7 @@ export default function OrdersTable() {
     const newEntry = {
       ...values,
       products: typeof values.products === 'string'
-        ? values.products.split(',').map((p) => p.trim())
+        ? values.products.split(',').map((p) => p.trim()).filter(Boolean)
         : values.products
     };
     setData((prev) => [...prev, newEntry]);
@@ -112,7 +104,12 @@ export default function OrdersTable() {
         <Button startIcon={<ArrowBackIcon />} variant="contained" sx={{ bgcolor: '#1e1e1e' }}>
           Volver
         </Button>
-        <Button startIcon={<AddIcon />} variant="contained" sx={{ bgcolor: '#1976d2' }} onClick={() => setOpenDialog(true)}>
+        <Button
+          startIcon={<AddIcon />}
+          variant="contained"
+          sx={{ bgcolor: '#1976d2' }}
+          onClick={() => setOpenDialog(true)}
+        >
           Nuevo
         </Button>
       </Box>
@@ -169,10 +166,12 @@ export default function OrdersTable() {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle sx={{ color: '#fff', bgcolor: '#1e1e1e' }}>Nueva Orden</DialogTitle>
+        <DialogTitle sx={{ color: '#fff', bgcolor: '#1e1e1e' }}>
+          Nueva Orden
+        </DialogTitle>
         <DialogContent sx={{ bgcolor: '#1e1e1e' }}>
           <Typography variant="body2" sx={{ mb: 2, color: '#ccc' }}>
-            Ingresa los datos de la nueva orden. 
+            Ingresa los datos de la nueva orden. Todos los campos son obligatorios.
           </Typography>
           <Formik
             initialValues={{
@@ -189,86 +188,55 @@ export default function OrdersTable() {
             {({ values, handleChange, handleSubmit, errors, touched }) => (
               <form onSubmit={handleSubmit}>
                 <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Teléfono de Comprador"
-                  name="phoneNumber"
-                  placeholder="Ej. 3321234567"
-                  value={values.phoneNumber}
-                  onChange={handleChange}
+                  fullWidth margin="normal" label="Teléfono"
+                  name="phoneNumber" value={values.phoneNumber}
+                  onChange={handleChange} sx={fieldStyles}
                   error={Boolean(errors.phoneNumber && touched.phoneNumber)}
                   helperText={touched.phoneNumber && errors.phoneNumber}
-                  sx={fieldStyles}
-                  InputLabelProps={{ style: { color: '#ccc' } }}
                 />
                 <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Total"
-                  name="total"
-                  placeholder="Ej. $1500"
-                  value={values.total}
-                  onChange={handleChange}
+                  fullWidth margin="normal" label="Total"
+                  name="total" value={values.total}
+                  onChange={handleChange} sx={fieldStyles}
                   error={Boolean(errors.total && touched.total)}
                   helperText={touched.total && errors.total}
-                  sx={fieldStyles}
-                  InputLabelProps={{ style: { color: '#ccc' } }}
                 />
                 <TextField
+                  select
                   fullWidth
                   margin="normal"
-                  select
                   label="Status"
                   name="status"
                   value={values.status}
                   onChange={handleChange}
+                  sx={fieldStyles}
                   error={Boolean(errors.status && touched.status)}
                   helperText={touched.status && errors.status}
-                  sx={fieldStyles}
-                  InputLabelProps={{ style: { color: '#ccc' } }}
                 >
                   <MenuItem value="Entregado">Entregado</MenuItem>
                   <MenuItem value="Cancelado">Cancelado</MenuItem>
                   <MenuItem value="Pendiente">Pendiente</MenuItem>
                 </TextField>
                 <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Fecha de creación"
-                  name="created"
-                  type="date"
-                  InputLabelProps={{ shrink: true, style: { color: '#ccc' } }}
-                  value={values.created}
-                  onChange={handleChange}
+                  fullWidth margin="normal" label="Fecha de creación"
+                  name="created" type="date" InputLabelProps={{ shrink: true }}
+                  value={values.created} onChange={handleChange} sx={fieldStyles}
                   error={Boolean(errors.created && touched.created)}
                   helperText={touched.created && errors.created}
-                  sx={fieldStyles}
                 />
                 <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Fecha de cancelación"
-                  name="cancelled"
-                  type="date"
-                  InputLabelProps={{ shrink: true, style: { color: '#ccc' } }}
-                  value={values.cancelled}
-                  onChange={handleChange}
+                  fullWidth margin="normal" label="Fecha de cancelación"
+                  name="cancelled" type="date" InputLabelProps={{ shrink: true }}
+                  value={values.cancelled} onChange={handleChange} sx={fieldStyles}
                   error={Boolean(errors.cancelled && touched.cancelled)}
                   helperText={touched.cancelled && errors.cancelled}
-                  sx={fieldStyles}
                 />
                 <TextField
-                  fullWidth
-                  margin="normal"
-                  label="Productos (separados por coma)"
-                  name="products"
-                  placeholder="Ej. Producto A, Producto B"
-                  value={values.products}
-                  onChange={handleChange}
+                  fullWidth margin="normal" label="Productos (separados por coma)"
+                  name="products" value={values.products}
+                  onChange={handleChange} sx={fieldStyles}
                   error={Boolean(errors.products && touched.products)}
                   helperText={touched.products && errors.products}
-                  sx={fieldStyles}
-                  InputLabelProps={{ style: { color: '#ccc' } }}
                 />
                 <DialogActions>
                   <Button onClick={() => setOpenDialog(false)} variant="outlined" sx={{ color: '#fff', borderColor: '#555' }}>Cancelar</Button>
