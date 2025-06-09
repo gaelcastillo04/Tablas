@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { BrowserRouter, useRoutes } from 'react-router-dom';
 import SidebarLayout from './SidebarLayout';
 import EmployeeTable from './EmployeeTable';
@@ -28,5 +28,15 @@ function App() {
     </BrowserRouter>
   );
 }
+
+export default App;
+*/
+
+import OrdersCards from './OrdersCards';
+
+function App() {
+  return <OrdersCards />;
+}
+
 
 export default App;
